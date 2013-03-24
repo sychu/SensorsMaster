@@ -454,7 +454,7 @@ public class OWNet {
         String retVal = null;
         in.readFully(data,0,data.length);
         retVal = new String(data,0/*packetHeader[OWNET_PROT_OFFSET]*/,packetHeader[OWNET_PROT_DATALEN]);
-        return retVal;
+        return retVal.trim();
     }
 
     /**
