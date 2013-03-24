@@ -17,6 +17,9 @@ object SensorsMaster extends App {
 	  SensorDef.debugMode = true
 	  val tempEmilka = new Sensor(ownet, "tempEmilka")
 	  val temp = tempEmilka.readProperty("temperature")
+	  println( tempEmilka )
+	  println( temp )
+	  println( tempEmilka.id )
 	  val pioSypialnia = new Sensor(ownet, "pioSypialnia")
 	  val pio7 = pioSypialnia.readProperty("PIO.7")
 	  println(pio7)
