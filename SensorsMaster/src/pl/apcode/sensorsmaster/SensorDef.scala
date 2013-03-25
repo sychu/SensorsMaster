@@ -2,15 +2,22 @@ package pl.apcode.sensorsmaster
 
 import org.owfs.ownet.OWNet
 
-abstract class SensorDef {
-    val net      : OWNet
-    val path     : String
+abstract class SensorDef( _net : OWNet,  _path : String) {
+
+    val net = _net
+    val path = _path
+     
+    lazy val ls = net.safeDir(path)
     
-    lazy val propertiesAll = net.Dir(path)
+    def read(name : String) = {
+      if(SensorDef.debugMode)
+        println(f"DEBUG: safeRead($path/$name)")
+      
+      net.safeRead(path + "/" + name)
+    }
     
-    def readProperty(name : String) = {
-	   val mval = net.Read(path + "/" + name)
-	   new Property(name, mval, this)
+    def getProperty(name : String) = {
+	   new Property(name, this)
 	}
 }
 
@@ -18,19 +25,35 @@ object SensorDef {
   var debugMode = false
 }
 
-class Directory(val net : OWNet, val path :  String) extends SensorDef {
-  
+class SensorDir(_net : OWNet, _path :  String) extends SensorDef(_net, _path) {
+ 
+	override def toString = f"SensorDir '$path'"
 }
 
-class Sensor(val net : OWNet, val path :  String) extends SensorDef {
-	lazy val stype =  readProperty("type")
-	lazy val id = readProperty("id")
+class Sensor(_net : OWNet, _path :  String) extends SensorDef(_net, _path) {
+	lazy val stype =  getProperty("type")
+	lazy val id = getProperty("id")
+	
 	override def toString = f"Sensor '$path' $id $stype"
 }
 
+class Thermometer(_net : OWNet, _path :  String) extends Sensor(_net, _path) {
+   lazy val temperature = getProperty("temperature")
+   
+   override def toString = super.toString + " " + temperature
+}
 
-class Property(val name : String, val value : String, val sensordef : SensorDef)  {
-	def read() = sensordef.readProperty(name)
+
+class Property(name : String, parentEl : SensorDef, valueInit: =>String)  {
+	
+	def this(name : String, parentEl : SensorDef) = this(name, parentEl, parentEl.read(name))
+	
+	lazy val value = valueInit
+	def get() = parentEl.getProperty(name)
+	
+	def set(valueToSet : String) = {
+	  new Property(name, parentEl, valueToSet) 
+	}
 	
 	override def toString = f"$name=$value"
 } 

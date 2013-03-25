@@ -16,13 +16,28 @@ object SensorsMaster extends App {
 	def testSensor() = {
 	  SensorDef.debugMode = true
 	  val tempEmilka = new Sensor(ownet, "tempEmilka")
-	  val temp = tempEmilka.readProperty("temperature")
+	  val temp = tempEmilka.getProperty("temperature")
 	  println( tempEmilka )
 	  println( temp )
 	  println( tempEmilka.id )
 	  val pioSypialnia = new Sensor(ownet, "pioSypialnia")
-	  val pio7 = pioSypialnia.readProperty("PIO.7")
+	  val pio7 = pioSypialnia.getProperty("PIO.7")
 	  println(pio7)
+	  println(pio7)
+	  println(pio7)
+	  
+	  val pio6 = pioSypialnia.getProperty("PIO.6")
+	  println(pio6.get().get().get())
+	  
+	  val tempGaraz = new Thermometer(ownet, "/tempGaraz")
+	  
+	  println(tempGaraz.temperature)
+	  
+	  println(tempGaraz)
+	  
+	  val lsdir = new SensorDir(ownet,"/structure/29")
+	  lsdir.ls.foreach(println _)
+	  
 	}
 	
 	def testOWNet() = {
