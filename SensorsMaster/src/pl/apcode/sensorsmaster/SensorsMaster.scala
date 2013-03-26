@@ -26,8 +26,10 @@ object SensorsMaster extends App {
 	  println(pio7)
 	  println(pio7)
 	  
+	  println(pio7.read())
+	  
 	  val pio6 = pioSypialnia.getProperty("PIO.6")
-	  println(pio6.get().get().get())
+	  println(pio6.read())
 	  
 	  val tempGaraz = new Thermometer(ownet, "/tempGaraz")
 	  

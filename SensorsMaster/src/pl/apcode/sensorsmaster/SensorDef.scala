@@ -45,15 +45,12 @@ class Thermometer(_net : OWNet, _path :  String) extends Sensor(_net, _path) {
 
 
 class Property(name : String, parentEl : SensorDef, valueInit: =>String)  {
-	
 	def this(name : String, parentEl : SensorDef) = this(name, parentEl, parentEl.read(name))
 	
 	lazy val value = valueInit
-	def get() = parentEl.getProperty(name)
-	
-	def set(valueToSet : String) = {
-	  new Property(name, parentEl, valueToSet) 
-	}
+
+	def read() = parentEl.read(name)
+	def write(valueToSet : String) : Boolean = true
 	
 	override def toString = f"$name=$value"
 } 
