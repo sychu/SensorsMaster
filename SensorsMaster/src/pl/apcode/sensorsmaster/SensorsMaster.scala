@@ -5,7 +5,7 @@ import org.owfs.ownet._
 object SensorsMaster extends App {
 	println("OWnet test")
 	
-	val host = "localhost"
+	val host = "kamaz"
 	val port = 3000
 	
 	val ownet = new OWNet(host,port)
