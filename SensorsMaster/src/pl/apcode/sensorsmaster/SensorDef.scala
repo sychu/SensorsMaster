@@ -39,15 +39,14 @@ class Sensor(_net : OWNet, _path :  String) extends SensorDef(_net, _path) {
 
 class Thermometer(_net : OWNet, _path :  String) extends Sensor(_net, _path) {
    lazy val temperature = getProperty("temperature")
-   
    override def toString = super.toString + " " + temperature
 }
 
 
-class Property(name : String, parentEl : SensorDef, valueInit: =>String)  {
-	def this(name : String, parentEl : SensorDef) = this(name, parentEl, parentEl.read(name))
+class Property(name : String, parentEl : SensorDef, valueInit: String = "", readInitialValue : Boolean = true)  {
+	def this(name : String, parentEl : SensorDef, valueInit: String) = this(name, parentEl, valueInit, false)
 	
-	lazy val value = valueInit
+	lazy val value = if(readInitialValue) read() else valueInit
 
 	def read() = parentEl.read(name)
 	def write(valueToSet : String) : Boolean = true
