@@ -1,55 +1,45 @@
 package pl.apcode.sensorsmaster
 
-import org.owfs.ownet.OWNet
 
-abstract class SensorDef( _net : OWNet,  _path : String) {
-
-    val net = _net
-    val path = _path
+abstract class SensorDef {
+    val driver : SensorDriver
+    val path : String
      
-    lazy val ls = net.safeDir(path)
+    lazy val dir = driver.dir(path)
     
-    def read(name : String) = {
-      if(SensorDef.debugMode)
-        println(f"DEBUG: safeRead($path/$name)")
-      
-      net.safeRead(path + "/" + name)
-    }
+    def read(name : String) = driver.read(path, name)
+    def write(name : String, value : String) = driver.write(path, name, value)
+
     
     def getProperty(name : String) = {
-	   new Property(name, this)
+	   new SensorProperty(name, this)
 	}
+    
+    def getPropertyDouble(name : String) = {
+      new SensorPropertyDouble(name, this)
+    }
+    
+    def getPropertyBoolean(name : String) = {
+      new SensorPropertyBoolean(name, this)
+    }
 }
 
-object SensorDef {
-  var debugMode = false
-}
 
-class SensorDir(_net : OWNet, _path :  String) extends SensorDef(_net, _path) {
- 
+class SensorDir(val driver : SensorDriver,  val path : String) extends SensorDef {
 	override def toString = f"SensorDir '$path'"
 }
 
-class Sensor(_net : OWNet, _path :  String) extends SensorDef(_net, _path) {
+class Sensor(val driver : SensorDriver,  val path : String) extends SensorDef {
 	lazy val stype =  getProperty("type")
 	lazy val id = getProperty("id")
 	
 	override def toString = f"Sensor '$path' $id $stype"
 }
 
-class Thermometer(_net : OWNet, _path :  String) extends Sensor(_net, _path) {
-   lazy val temperature = getProperty("temperature")
+class Thermometer(val driver : SensorDriver,  val path : String) extends SensorDef {
+   lazy val temperature = getPropertyDouble("temperature")
+   
    override def toString = super.toString + " " + temperature
 }
 
 
-class Property(name : String, parentEl : SensorDef, valueInit: String = "", readInitialValue : Boolean = true)  {
-	def this(name : String, parentEl : SensorDef, valueInit: String) = this(name, parentEl, valueInit, false)
-	
-	lazy val value = if(readInitialValue) read() else valueInit
-
-	def read() = parentEl.read(name)
-	def write(valueToSet : String) : Boolean = true
-	
-	override def toString = f"$name=$value"
-} 
