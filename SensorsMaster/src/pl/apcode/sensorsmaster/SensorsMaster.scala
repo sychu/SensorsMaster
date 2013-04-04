@@ -11,7 +11,7 @@ object SensorsMaster extends App {
 
 	testSensor()
 	
-	//git test
+	//git test & push to kamaz too
 	
 	//testOWNet()
 
