@@ -2,12 +2,12 @@ package pl.apcode.sensorsmaster
 
 import  scala.reflect.runtime.universe._
 
-abstract class SensorPropertyDef[T] {
+abstract class SensorPropertyDef[T : TypeTag](valueInit : => T) {
     val parentEl : SensorDef
     val name : String
 
-    val initialValue = read()
-
+    lazy val value = valueInit
+    
     def write(value : T) : T = {
         parentEl.write(name, value)
         value
@@ -15,11 +15,18 @@ abstract class SensorPropertyDef[T] {
 
     def read() : T = parentEl.read(name)
 
-    override def toString = s"$name=$initialValue"
+    override def toString = s"$name=$value"
 
 }
 
-class SensorProperty[T](
-    val name : String, 
-    val parentEl : SensorDef) extends SensorPropertyDef[T] {
-}
+
+
+class SensorProperty[T : TypeTag](
+    val name : String, val parentEl : SensorDef,  valueInit : => T) extends SensorPropertyDef[T](valueInit)  {
+  
+	def this(name : String, parentEl : SensorDef) {
+	  this(name, parentEl, parentEl.read(name))
+	}
+} 
+    
+

@@ -5,8 +5,8 @@ import org.owfs.ownet._
 import scala.reflect.runtime.universe._
 
 trait SensorDriver {
-    def read[T](path : String, property : String) : T
-    def write[T](path: String, property : String, value: T): Unit
+    def read[T : TypeTag](path : String, property : String) : T
+    def write[T : TypeTag](path: String, property : String, value: T): Unit
     def dir(path: String) : List[String]
     def connect(): Unit
     def disconnect(): Unit
@@ -36,11 +36,11 @@ trait SensorDriver {
 }
 
 trait SensorDriverLog extends SensorDriver {
-    override abstract def read[T](path : String, property : String) : T = {
+    override abstract def read[T : TypeTag](path : String, property : String) : T = {
         log(s"SensorDriver: read '$path' $property")
         super.read(path, property)
     }
-    override abstract def write[T](path: String, property : String, value: T): Unit = {
+    override abstract def write[T : TypeTag](path: String, property : String, value: T): Unit = {
         log(s"SensorDriver: write '$path' $property $value")
         super.write(path, property, value)
     }
@@ -60,12 +60,12 @@ class OWNetDriver(val host : String, val port : Int) extends SensorDriver {
 
     private val ownet = new OWNet(host, port) 
 
-    def read[T](path : String, property : String) : T = {
+    def read[T : TypeTag](path : String, property : String) : T = {
         val value = ownet.Read(pathCombine(path, property))
         convertToValue(value)
     }
 
-    def write[T](path: String, property : String, value: T) = {
+    def write[T : TypeTag](path: String, property : String, value: T) = {
         ownet.Write(pathCombine(path, property), converToString(value))
     }
 

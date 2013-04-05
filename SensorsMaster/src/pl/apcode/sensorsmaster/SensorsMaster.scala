@@ -16,21 +16,28 @@ object SensorsMaster extends App {
         val owdrv = new OWNetDriver(host, port) with SensorDriverLog 
 
         val tempEmilka = new Sensor(owdrv, "tempEmilka")
-        val temp = tempEmilka.getProperty("temperature")
+        val temp = tempEmilka.getProperty[String]("temperature")
         println( tempEmilka )
         println( temp )
         println( tempEmilka.id )
         val pioSypialnia = new Sensor(owdrv, "pioSypialnia")
-        val pio7 = pioSypialnia.getProperty("PIO.7")
+        val pio7 = pioSypialnia.getProperty[Boolean]("PIO.7")
+
+        
         println(pio7)
         println(pio7)
         println(pio7)
 
+        
         println(pio7.read())
 
-        val pio6 = pioSypialnia.getProperty("PIO.6")
+        val pio6 = pioSypialnia.getProperty[Boolean]("PIO.6")
         println(pio6.read())
 
+        val pio2 = pioSypialnia.getProperty[Boolean]("PIO.2", true)
+
+        println(pio2)
+        
         val tempGaraz = new Thermometer(owdrv, "/tempGaraz")
         tempGaraz.temperature
 
