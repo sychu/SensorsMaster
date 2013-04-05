@@ -14,13 +14,11 @@ trait SensorDriver {
     def pathCombine(pathA: String, pathB : String) : String
     def pathParse(path: String) : String
 
-    protected def converToString[T](value: T): String = value match {
-        case x: Boolean => if (x) "1" else "0"
-        case x          => value.toString
-    }
+    protected def converToString[T](value: T): String =  value.toString()
+
     protected def convertToValue[T: TypeTag](value: String): T = {
         val converted = typeOf[T] match {
-            case x if x =:= typeOf[Boolean] => if (value.toInt == 0) false else true
+            case x if x =:= typeOf[Boolean] => value.toBoolean
             case x if x =:= typeOf[Byte]    => value.toByte
             case x if x =:= typeOf[Char]    => value.charAt(0)
             case x if x =:= typeOf[Short]   => value.toShort
@@ -56,10 +54,24 @@ trait SensorDriverLog extends SensorDriver {
     private def log(message: => String): Unit = println("DEBUG => " + message)
 }
 
+
 class OWNetDriver(val host : String, val port : Int) extends SensorDriver {
 
-    private val ownet = new OWNet(host, port) 
+   private val ownet = new OWNet(host, port) 
 
+   override protected def convertToValue[T: TypeTag](value: String): T = {
+        val converted = typeOf[T] match {
+            case x if x =:= typeOf[Boolean] => if (value.toInt == 0) false else true
+            case _ => super.convertToValue(value)
+        }
+        converted.asInstanceOf[T]
+    }
+    
+   override protected def converToString[T](value: T): String =  value match {
+   	   case x: Boolean => if (x) "1" else "0"
+       case x          => super.converToString(value)
+   }
+   
     def read[T : TypeTag](path : String, property : String) : T = {
         val value = ownet.Read(pathCombine(path, property))
         convertToValue(value)
